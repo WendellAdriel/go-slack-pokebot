@@ -1,8 +1,15 @@
 package commands
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+)
 
 func ExecPokemonCommand(searchValue string) string {
-	response := fmt.Sprintf("*Info about Pokemon: %s*\nINFO", searchValue)
-	return response
+	var responseBuffer bytes.Buffer
+
+	responseBuffer.WriteString(fmt.Sprintf("*Info about Pokemon: %s*\n", searchValue))
+	responseBuffer.WriteString("INFO")
+
+	return responseBuffer.String()
 }

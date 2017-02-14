@@ -11,36 +11,6 @@ import (
 	"github.com/nlopes/slack"
 )
 
-func buildReply(ev *slack.MessageEvent, api *slack.Slack) {
-	messageArray := strings.Fields(ev.Text)
-	command := messageArray[1]
-	var response string
-
-	switch command {
-	case "help":
-		response = commands.ExecHelpCommand()
-	case "pokemon":
-		commandParameter := messageArray[2]
-		response = commands.ExecPokemonCommand(commandParameter)
-	default:
-		response = commands.ExecDefaultCommand()
-	}
-
-	_, _, chanID, err := api.OpenIMChannel(ev.UserId)
-	if err != nil {
-		log.Fatal("Error opening IM: ", err)
-	}
-
-	params := slack.PostMessageParameters{}
-	channelId, timestamp, err := api.PostMessage(chanID, response, params)
-
-	if err != nil {
-		log.Fatal("Error: ", err)
-	}
-
-	fmt.Printf("Message successfully sent to channel %s at %s", channelId, timestamp)
-}
-
 func main() {
 	chSender := make(chan slack.OutgoingMessage)
 	chReceiver := make(chan slack.SlackEvent)
@@ -73,7 +43,7 @@ func main() {
 			case *slack.PresenceChangeEvent:
 				botId = ev.UserId
 			case *slack.MessageEvent:
-				if ev.Type == "message" && strings.HasPrefix(ev.Text, "<@"+botId+">") {
+				if isBotMessage(ev, botId) {
 					buildReply(ev, api)
 				}
 			case *slack.SlackWSError:
@@ -84,4 +54,50 @@ func main() {
 			}
 		}
 	}
+}
+
+func isBotMessage(ev *slack.MessageEvent, botId string) bool {
+	if ev.Type == "message" && strings.HasPrefix(ev.Text, "<@"+botId+">") {
+		return true
+	}
+	return false
+}
+
+func buildReply(ev *slack.MessageEvent, api *slack.Slack) {
+	messageArray := strings.Fields(ev.Text)
+	response := buildResponseText(ev, api, messageArray)
+	sendMessage(ev, api, response)
+}
+
+func buildResponseText(ev *slack.MessageEvent, api *slack.Slack, messageArray []string) string {
+	command := messageArray[1]
+	var response string
+
+	switch command {
+	case "help":
+		response = commands.ExecHelpCommand()
+	case "pokemon":
+		commandParameter := messageArray[2]
+		response = commands.ExecPokemonCommand(commandParameter)
+	default:
+		response = commands.ExecDefaultCommand()
+	}
+
+	return response
+}
+
+func sendMessage(ev *slack.MessageEvent, api *slack.Slack, response string) {
+	_, _, chanID, err := api.OpenIMChannel(ev.UserId)
+	if err != nil {
+		log.Fatal("Error opening IM: ", err)
+	}
+
+	params := slack.PostMessageParameters{}
+	channelId, timestamp, err := api.PostMessage(chanID, response, params)
+
+	if err != nil {
+		log.Fatal("Error: ", err)
+	}
+
+	fmt.Printf("Message successfully sent to channel %s at %s", channelId, timestamp)
 }
