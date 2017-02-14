@@ -1,0 +1,4 @@
+package: github.com/WendellAdriel/bot-test
+import:
+- package: github.com/nlopes/slack
+  version: ^0.0.1
