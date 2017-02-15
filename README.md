@@ -35,4 +35,4 @@ go run pokebot.go
 ## Commands
 
 - `help:` Lists all other commands with description and examples
-- `pokemon:` Gets info about the given Pokemon number or name **(in progress)**
+- `pokemon:` Gets info about the given Pokemon number or name
