@@ -15,7 +15,7 @@ func GetToken() string {
 	file, err := ioutil.ReadFile("./config/token.json")
 
 	if err != nil {
-		log.Fatal("File doesn't exist")
+		log.Fatal("Token file doesn't exist")
 	}
 
 	err = json.Unmarshal(file, &token)
