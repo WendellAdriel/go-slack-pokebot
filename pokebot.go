@@ -65,11 +65,11 @@ func isBotMessage(ev *slack.MessageEvent, botId string) bool {
 
 func buildReply(ev *slack.MessageEvent, api *slack.Slack) {
 	messageArray := strings.Fields(ev.Text)
-	response := buildResponseText(ev, api, messageArray)
+	response := buildResponseText(messageArray)
 	sendMessage(ev, api, response)
 }
 
-func buildResponseText(ev *slack.MessageEvent, api *slack.Slack, messageArray []string) string {
+func buildResponseText(messageArray []string) string {
 	command := messageArray[1]
 	var response string
 

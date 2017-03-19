@@ -11,10 +11,10 @@ import (
 	"time"
 )
 
-const API_PATH string = "https://pokeapi.co/api/v2/"
+const PATH string = "https://pokeapi.co/api/v2/"
 
 func GetPokemonInfo(searchValue string) string {
-	url := fmt.Sprintf(API_PATH+"%s/%s", "pokemon", searchValue)
+	url := fmt.Sprintf(PATH+"%s/%s", "pokemon", searchValue)
 
 	response, err := makeRequest(url)
 	if err != nil {
